@@ -1,8 +1,10 @@
 {
   "name": "eslint-plugin-path",
-  "version": "0.1.1-rc.0",
+  "version": "1.0.0",
   "main": "lib/index.js",
+  "author": "qDanik <qdanik@yandex.ru>",
   "license": "MIT",
+  "homepage": "https://github.com/qDanik/eslint-plugin-path#readme",
   "keywords": [
     "eslint",
     "eslintplugin",
@@ -34,5 +36,11 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.4.1"
+  },
+  "peerDependencies": {
+    "eslint": ">=6.0.0"
+  },
+  "directories": {
+    "docs": "docs"
   }
 }
