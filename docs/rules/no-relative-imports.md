@@ -1,6 +1,6 @@
 # path/no-relative-imports
 
-Disallows the use of relative file imports where absolute is preferred. This rule only affects paths included in tsconfig.
+Disallows the use of relative file imports where absolute is preferred. This rule only affects paths included in tsconfig or jsconfig.
 
 **Fixable:** This rule is automatically fixable using the `--fix` command line option.
 
@@ -16,7 +16,7 @@ project
 ```
 
 ```
-project/tsconfig.json
+project/(jsconfig|tsconfig).json
 └─── compilerOptions
     └─── baseUrl = "./src"
 or
