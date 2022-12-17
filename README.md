@@ -1,6 +1,6 @@
 # eslint-plugin-path [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-An ESLint plugin for enforcing consistent imports across project.
+An ESLint plugin for enforcing consistent imports across project. In other words, it helps to replace all relatives import with absolutes dependinng on settings.
 
 ## Installation
 
