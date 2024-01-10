@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-path",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "main": "lib/index.js",
   "author": "qDanik <qdanik@yandex.ru>",
   "license": "MIT",
