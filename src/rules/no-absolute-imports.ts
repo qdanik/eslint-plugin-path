@@ -1,58 +1,32 @@
-"use strict";
+import { Rule } from 'eslint';
+import { getImport } from "../utils";
+import { relative, dirname } from "path";
 
-const { getImport } = require("../utils");
-const { relative, dirname } = require("path");
-/**
- * @typedef {import("../utils/config").AliasItem} AliasItem
- */
+export const replaceBackSlashesWithForward = (path: string): string => !path ? "" : path.replace(/\\/g, "/");
 
-/**
- * Replace all backslashes (\) with forward slashes (/)
- * @param {string} path
- * @returns {string} - path with forward slashes
- */
-function replaceBackSlashesWithForward(path) {
-  if (!path) {
-    return "";
-  }
-  return path.replace(/\\/g, "/");
-}
-
-/**
- * @typedef {Object} RuleSettings
- */
-/**
- *
- * @param {import('eslint').Rule.RuleContext} context
- * @returns
- */
-function noAbsoluteImportCreate(context) {
+function noAbsoluteImportCreate(context: Rule.RuleContext): Rule.RuleListener {
   return getImport(
     context,
     ({ node, start, value: current, end, path, filename }) => {
       if (current[0] != "/") return;
-
+  
       let expected = replaceBackSlashesWithForward(
         relative(dirname(filename), path)
       );
-
+  
       if (!expected.startsWith("../")) {
         expected = "./" + expected;
       }
-
+  
       const data = {
         current,
         expected,
       };
-
-      /**
-       * @param {import('eslint').Rule.RuleFixer} fixer
-       * @returns {import('eslint').Rule.Fix}
-       */
-      const fix = (fixer) =>
+  
+      const fix = (fixer: Rule.RuleFixer): Rule.Fix =>
         fixer.replaceTextRange([start + 1, end - 1], expected);
-
-      context.report({
+  
+      const descriptor = {
         node,
         messageId: "noAbsoluteImports",
         data,
@@ -64,13 +38,14 @@ function noAbsoluteImportCreate(context) {
             fix,
           },
         ],
-      });
-    }
+      }
+  
+      context.report(descriptor);
+    },
   );
 }
 
-/** @type {import('eslint').Rule.RuleModule} */
-module.exports = {
+const rule: Rule.RuleModule = {
   meta: {
     type: "problem",
     docs: {
@@ -90,3 +65,5 @@ module.exports = {
   },
   create: noAbsoluteImportCreate,
 };
+
+export default rule;

@@ -1,19 +1,17 @@
-"use strict";
-
-const { getImport } = require("../utils");
-const { isRelativeToParent, isExternalPath } = require("../utils/import-types");
-const { relative } = require("path");
-/**
- * @typedef {import("../utils/config").AliasItem} AliasItem
- */
+import { Rule } from 'eslint';
+import { getImport } from "../utils";
+import { AliasItem } from '../utils/config';
+import { isRelativeToParent, isExternalPath } from "../utils/import-types";
+import { relative } from "path";
+import { RuleSettings } from './types';
 
 /**
  * Creates an absolute path to target using an array of alias items
  * @param {string} target
- * @param {Array<AliasItem>} aliases
- * @returns {string} - absolute path import
+ * @param {AliasItem[]} aliases
+ * @returns {string} - absolute path to target
  */
-function getAbsolutePathToTarget(target, aliases = []) {
+function getAbsolutePathToTarget(target: string, aliases:  AliasItem[] = []): string {
   if (!target || !aliases) {
     return "";
   }
@@ -27,9 +25,9 @@ function getAbsolutePathToTarget(target, aliases = []) {
 /**
  * Calculate slash counts
  * @param {string} path
- * @returns {number} - number of slashes
+ * @returns {number} - slash counts
  */
-function getSlashCounts(path) {
+function getSlashCounts(path: string): number {
   if (!path) {
     return 0;
   }
@@ -42,7 +40,7 @@ function getSlashCounts(path) {
  * @param {string} path
  * @returns {string} - path with forward slashes
  */
-function replaceBackSlashesWithForward(path) {
+function replaceBackSlashesWithForward(path: string): string {
   if (!path) {
     return "";
   }
@@ -55,7 +53,7 @@ function replaceBackSlashesWithForward(path) {
  * @param {RuleSettings} settings
  * @returns {boolean} - true if max depth exceeded
  */
-function isMaxDepthExceeded(current, settings) {
+function isMaxDepthExceeded(current: string, settings: RuleSettings): boolean {
   if (!current) {
     return false;
   }
@@ -65,19 +63,14 @@ function isMaxDepthExceeded(current, settings) {
 }
 
 /**
- * @typedef {Object} RuleSettings
- * @property {number} maxDepth
- * @property {boolean} suggested
- */
-/**
- *
- * @param {import('eslint').Rule.RuleContext} context
+ * Rule to disallow relative imports of files where absolute is preferred
+ * @param {Rule.RuleContext} context
  * @returns
  */
-function noRelativeImportCreate(context) {
+function noRelativeImportCreate(context: Rule.RuleContext) {
   const { maxDepth = 2, suggested = false } = context.options[0] || {};
-  /** @type {RuleSettings} */
-  const settings = { maxDepth, suggested };
+  const settings: RuleSettings = { maxDepth, suggested };
+
 
   return getImport(
     context,
@@ -96,11 +89,11 @@ function noRelativeImportCreate(context) {
       ) {
         return;
       }
-
+  
       const expected = replaceBackSlashesWithForward(
         getAbsolutePathToTarget(path, configSettings)
       );
-
+  
       if (
         (settings.suggested &&
           getSlashCounts(current) < getSlashCounts(expected)) ||
@@ -108,20 +101,16 @@ function noRelativeImportCreate(context) {
       ) {
         return;
       }
-
+  
       const data = {
         current,
         expected,
       };
-
-      /**
-       * @param {import('eslint').Rule.RuleFixer} fixer
-       * @returns {import('eslint').Rule.Fix}
-       */
-      const fix = (fixer) =>
+  
+      const fix = (fixer: Rule.RuleFixer): Rule.Fix =>
         fixer.replaceTextRange([start + 1, end - 1], expected);
 
-      context.report({
+      const descriptor = {
         node,
         messageId: "noRelativeImports",
         data,
@@ -133,13 +122,14 @@ function noRelativeImportCreate(context) {
             fix,
           },
         ],
-      });
-    }
+      }
+  
+      context.report(descriptor);
+    },
   );
 }
 
-/** @type {import('eslint').Rule.RuleModule} */
-module.exports = {
+const rule: Rule.RuleModule = {
   meta: {
     type: "problem",
     docs: {
@@ -172,3 +162,5 @@ module.exports = {
   },
   create: noRelativeImportCreate,
 };
+
+export default rule;

@@ -1,6 +1,6 @@
 # path/only-absolute-imports
 
-This rule enforces that all imports are absolute and not relative. This rule only affects paths included in tsconfig or jsconfig.
+This rule requires that all imports must be absolute rather than relative. It only applies to paths specified in tsconfig or jsconfig.
 
 **Fixable:** This rule is automatically fixable using the `--fix` command line option.
 

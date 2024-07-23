@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "inlineSources": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "Node16",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "lib": [
+      "esnext"
+    ],
+    "composite": true,
+    "incremental": true,
+    "declaration": true,
+    "declarationMap": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "outDir": "lib",
+    "module": "Node16",
+    "target": "es6",
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "src/load-tsconfig.d.ts"
+    ]
+  },
+  "include": [
+    "src"
+  ]
+}

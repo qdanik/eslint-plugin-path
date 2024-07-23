@@ -1,6 +1,6 @@
 # path/no-relative-imports
 
-Disallows the use of relative file imports where absolute is preferred. This rule only affects paths included in tsconfig or jsconfig.
+Prohibits the use of relative file imports when absolute imports are preferred. This rule only applies to paths specified in tsconfig or jsconfig.
 
 **Fixable:** This rule is automatically fixable using the `--fix` command line option.
 
@@ -53,7 +53,7 @@ This rule supports the following options:
 
 * default: `2`
 
-Helps handle the max depth of relative import and throw an error if depth is exceeded.
+Helps manage the maximum depth of relative imports and throws an error if the depth limit is exceeded.
 
 ## Fail
 
@@ -79,8 +79,8 @@ import foo from "../../components/button";
 
 * default: `false`
 
-Suggest more preferable path for import based on slash count. Slash is '/'.
-For example, if you use "../../components/button" (number of slashes 3) and the suggested one is "components/button" (number of slashes 1), it will be replaced by the suggested because 3 > 1 and the last one is shortest.   
+Propose a more optimal import path based on the number of slashes ('/'). 
+For instance, if your current path is "../../components/button" (with 3 slashes) and the recommended path is "components/button" (with 1 slash), the latter will replace the former as it has fewer slashes and is thus shorter.  
 
 ## Fail
 
