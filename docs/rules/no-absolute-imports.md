@@ -4,6 +4,11 @@ Disallows the use of absolute file imports. This rule only affects paths include
 
 **Fixable:** This rule is automatically fixable using the `--fix` command line option.
 
+**Doesn't work with eslint-plugin-import/no-absolute-path:**
+```
+"import/no-absolute-path": "off" // disable this rule
+```
+
 ## Example
 
 These examples have the following project structure:

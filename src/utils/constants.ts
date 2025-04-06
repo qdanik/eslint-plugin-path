@@ -1,11 +1,5 @@
-"use strict";
-
-const FILES = {
+export const FILES = {
   package: "package.json",
   tsconfig: "tsconfig.json",
   jsconfig: "jsconfig.json",
-};
-
-module.exports = {
-  FILES,
 };
