@@ -1,6 +1,7 @@
+import { TSESLint } from '@typescript-eslint/utils';
+
 import { rules } from './rules';
 import packageJson from '../package.json';
-import { TSESLint } from '@typescript-eslint/utils';
 
 
 const eslintPluginPath: TSESLint.FlatConfig.Plugin = {
@@ -17,7 +18,7 @@ const eslintPluginPath: TSESLint.FlatConfig.Plugin = {
 
 const plugins = {
   'path': eslintPluginPath,
-}
+};
 
 const flatConfigPlugin: TSESLint.FlatConfig.Plugin = {
   ...eslintPluginPath,

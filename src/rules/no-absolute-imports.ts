@@ -1,32 +1,39 @@
-import { Rule } from 'eslint';
-import { getImport } from "../utils";
+import { ReportDescriptor, ReportFixFunction, RuleContext, RuleListener, RuleModule } from '@typescript-eslint/utils/ts-eslint';
 import { relative, dirname } from "path";
+
+import { getImport } from "../utils";
+
+type MessageIds = "noAbsoluteImports" | "replaceAbsoluteImport";
+
+type Options = [];
+
+type Context = Readonly<RuleContext<MessageIds, Options>>;
 
 export const replaceBackSlashesWithForward = (path: string): string => !path ? "" : path.replace(/\\/g, "/");
 
-function noAbsoluteImportCreate(context: Rule.RuleContext): Rule.RuleListener {
+function noAbsoluteImportCreate(context: Context): RuleListener {
   return getImport(
     context,
     ({ node, start, value: current, end, path, filename }) => {
       if (current[0] != "/") return;
-  
+
       let expected = replaceBackSlashesWithForward(
         relative(dirname(filename), path)
       );
-  
+
       if (!expected.startsWith("../")) {
         expected = "./" + expected;
       }
-  
+
       const data = {
         current,
         expected,
       };
-  
-      const fix = (fixer: Rule.RuleFixer): Rule.Fix =>
+
+      const fix: ReportFixFunction = (fixer) =>
         fixer.replaceTextRange([start + 1, end - 1], expected);
-  
-      const descriptor = {
+
+      const descriptor: ReportDescriptor<MessageIds> = {
         node,
         messageId: "noAbsoluteImports",
         data,
@@ -38,14 +45,14 @@ function noAbsoluteImportCreate(context: Rule.RuleContext): Rule.RuleListener {
             fix,
           },
         ],
-      }
-  
+      };
+
       context.report(descriptor);
     },
   );
 }
 
-const rule: Rule.RuleModule = {
+const noAbsoluteImportsRule: RuleModule<MessageIds> = {
   meta: {
     type: "problem",
     docs: {
@@ -55,7 +62,7 @@ const rule: Rule.RuleModule = {
     },
     fixable: "code",
     hasSuggestions: true,
-    schema: [{}],
+    schema: [],
     messages: {
       noAbsoluteImports:
         "Absolute import path '{{current}}' should be replaced with '{{expected}}'",
@@ -63,7 +70,8 @@ const rule: Rule.RuleModule = {
         "Replace absolute import path '{{current}}' with absolute '{{expected}}'",
     },
   },
+  defaultOptions: [],
   create: noAbsoluteImportCreate,
 };
 
-export default rule;
+export default noAbsoluteImportsRule;

@@ -1,5 +1,5 @@
-import { join } from "path";
 import { existsSync, readFileSync } from "fs";
+import { join } from "path";
 import { loadTsConfig } from "load-tsconfig";
 
 /**
