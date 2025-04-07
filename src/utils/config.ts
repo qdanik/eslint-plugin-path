@@ -1,6 +1,7 @@
 import { join, isAbsolute } from "path";
 import { FILES } from "./constants";
 import { loadConfigFile, isFileExists, isPathExists } from "./helpers";
+import { ConfigSettings } from "./types";
 
 /**
  * Alias item structure
@@ -34,13 +35,16 @@ export function getAliasItemCreator(packageDir: string): (path: string, alias?: 
   };
 }
 
+const CONFIG_CACHE = new Map<string, AliasItem[]>();
+
 /**
  * Creates alias items that were described in tsconfig.json
  *
- * @param packagePath - The package path
+ * @param {string} packagePath - The package path
+ * @param {ConfigSettings} settings - The config settings
  * @returns Returns array of alias items
  */
-export function getConfigSettings(packagePath: string): Array<AliasItem> {
+export function getConfigSettings(packagePath: string, settings: ConfigSettings): Array<AliasItem> {
   let fileName: string | null = null;
 
   if (isFileExists(packagePath, FILES.tsconfig)) {
@@ -51,11 +55,22 @@ export function getConfigSettings(packagePath: string): Array<AliasItem> {
     fileName = FILES.jsconfig;
   }
 
+  if(settings?.config && isFileExists(packagePath, settings?.config)) {
+    fileName = settings?.config;
+  }
+
   if (fileName === null) {
     return [];
   }
 
   const urls: AliasItem[] = [];
+  const key = `${packagePath}/${fileName}`;
+  const cached = CONFIG_CACHE.get(key);
+
+  if (cached) {
+    return cached;
+  }
+
   const config = loadConfigFile(packagePath, fileName);
   const createAliasItem = getAliasItemCreator(packagePath);
 
@@ -69,6 +84,8 @@ export function getConfigSettings(packagePath: string): Array<AliasItem> {
   if (isPathExists(config, "data.compilerOptions.baseUrl")) {
     urls.push(createAliasItem(config.data.compilerOptions.baseUrl));
   }
+
+  CONFIG_CACHE.set(key, urls);
 
   return urls;
 }

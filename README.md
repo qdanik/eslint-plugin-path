@@ -74,6 +74,18 @@ module.exports = {
 };
 ```
 
+## Custom tsconfig/jsconfig paths
+If you are using custom paths in your `tsconfig.json` or `jsconfig.json` file, you can specify the path to the configuration file in the ESLint configuration file. You can do this by adding the following lines to your config file:
+
+```json
+{
+  "settings": {
+    "path": {
+      "config": "tsconfig.json" // or "./jsconfig.json"
+    }
+  }
+}
+```
 
 ## Configuration
 
@@ -84,7 +96,7 @@ Enable the rules in your ESLint configuration file:
   "plugins": ["path"],
   "rules": {
     "path/no-relative-imports": "error",
-  }
+  },
 }
 ```
 

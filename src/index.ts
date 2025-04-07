@@ -1,9 +1,9 @@
-import { ESLint } from 'eslint';
 import { rules } from './rules';
 import packageJson from '../package.json';
+import { TSESLint } from '@typescript-eslint/utils';
 
 
-const eslintPluginPath: ESLint.Plugin = {
+const eslintPluginPath: TSESLint.FlatConfig.Plugin = {
   meta: {
     name: 'eslint-plugin-path',
     version: packageJson.version,
@@ -13,15 +13,23 @@ const eslintPluginPath: ESLint.Plugin = {
     'no-absolute-imports': rules.noAbsoluteImports,
     'only-absolute-imports': rules.onlyAbsoluteImports,
   },
+};
+
+const plugins = {
+  'path': eslintPluginPath,
+}
+
+const flatConfigPlugin: TSESLint.FlatConfig.Plugin = {
+  ...eslintPluginPath,
   configs: {
     recommended: {
-      plugins: ['path'],
+      plugins,
       rules: {
         'path/no-relative-imports': ['error', { maxDepth: 1, suggested: true }],
       },
     },
     all: {
-      plugins: ['path'],
+      plugins,
       rules: {
         'path/no-relative-imports': ['error', { maxDepth: 2, suggested: false }],
       },
@@ -29,4 +37,4 @@ const eslintPluginPath: ESLint.Plugin = {
   }
 };
 
-export = eslintPluginPath;
+export = flatConfigPlugin;
