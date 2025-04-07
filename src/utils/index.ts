@@ -4,7 +4,7 @@ import { Rule } from "eslint";
 import { getPackagePath } from "./package";
 import { getConfigSettings, AliasItem } from "./config";
 import { isExistingPath } from "./import-types";
-import { ConfigureSource } from './types';
+import { ConfigSettings, ConfigureSource, NodeParentExtension } from './types';
 
 /**
  * ImportHandlerParams type definition
@@ -19,11 +19,6 @@ interface ImportHandlerParams {
   configSettings: AliasItem[];
   filename: string;
 }
-
-interface NodeParentExtension {
-  parent: Node;
-}
-type Node = ESTree.Node & NodeParentExtension;
 
 /**
  * Params configurator
@@ -77,12 +72,13 @@ function configureParams<T>(
  */
 export function getImport(context: Rule.RuleContext, callback: (params: ImportHandlerParams) => void): any {
   const filename = context.filename;
+  const settings = (context.settings?.path ?? {}) as ConfigSettings;
 
   if (!filename) {
     return {};
   }
   const packagePath = getPackagePath(filename);
-  const configSettings = getConfigSettings(packagePath);
+  const configSettings = getConfigSettings(packagePath, settings);
 
   return {
     ImportDeclaration: (node: ESTree.ImportDeclaration & NodeParentExtension) => {

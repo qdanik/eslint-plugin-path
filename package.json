@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-path",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "lib/index.js",
   "author": "qDanik <qdanik@yandex.ru>",
   "license": "MIT",
@@ -26,7 +26,7 @@
   "repository": "qDanik/eslint-plugin-path",
   "scripts": {
     "format": "prettier . -w --ignore-path .gitignore",
-    "build": "tsc -b",
+    "build": "rm -rf ./tsconfig.tsbuildinfo && tsc -b",
     "test": "jest"
   },
   "dependencies": {
