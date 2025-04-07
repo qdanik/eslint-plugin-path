@@ -34,6 +34,8 @@ export function getAliasItemCreator(packageDir: string): (path: string, alias?: 
   };
 }
 
+const CONFIG_CACHE = new Map<string, AliasItem[]>();
+
 /**
  * Creates alias items that were described in tsconfig.json
  *
@@ -56,6 +58,13 @@ export function getConfigSettings(packagePath: string): Array<AliasItem> {
   }
 
   const urls: AliasItem[] = [];
+  const key = `${packagePath}/${fileName}`;
+  const cached = CONFIG_CACHE.get(key);
+
+  if (cached) {
+    return cached;
+  }
+
   const config = loadConfigFile(packagePath, fileName);
   const createAliasItem = getAliasItemCreator(packagePath);
 
@@ -69,6 +78,8 @@ export function getConfigSettings(packagePath: string): Array<AliasItem> {
   if (isPathExists(config, "data.compilerOptions.baseUrl")) {
     urls.push(createAliasItem(config.data.compilerOptions.baseUrl));
   }
+
+  CONFIG_CACHE.set(key, urls);
 
   return urls;
 }
