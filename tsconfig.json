@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "isolatedModules": true,
     "sourceMap": true,
     "inlineSources": true,
     "strict": true,

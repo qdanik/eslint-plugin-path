@@ -1,5 +1,6 @@
 import { dirname, join, resolve } from "path";
 import { existsSync } from "fs";
+
 import { FILES } from "./constants";
 
 /**

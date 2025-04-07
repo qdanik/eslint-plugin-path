@@ -1,9 +1,16 @@
-import { Rule } from 'eslint';
+import { ReportDescriptor, ReportFixFunction, RuleContext, RuleListener, RuleModule } from '@typescript-eslint/utils/ts-eslint';
+import { relative } from "path";
+
 import { getImport } from "../utils";
 import { AliasItem } from '../utils/config';
 import { isRelativeToParent, isExternalPath } from "../utils/import-types";
-import { relative } from "path";
 import { RuleSettings } from './types';
+
+export type MessageIds = "noRelativeImports" | "replaceRelativeImport";
+
+export type Options = [RuleSettings];
+
+export type Context = Readonly<RuleContext<MessageIds, Options>>;
 
 /**
  * Creates an absolute path to target using an array of alias items
@@ -11,7 +18,7 @@ import { RuleSettings } from './types';
  * @param {AliasItem[]} aliases
  * @returns {string} - absolute path to target
  */
-function getAbsolutePathToTarget(target: string, aliases:  AliasItem[] = []): string {
+function getAbsolutePathToTarget(target: string, aliases: AliasItem[] = []): string {
   if (!target || !aliases) {
     return "";
   }
@@ -64,13 +71,12 @@ function isMaxDepthExceeded(current: string, settings: RuleSettings): boolean {
 
 /**
  * Rule to disallow relative imports of files where absolute is preferred
- * @param {Rule.RuleContext} context
+ * @param {Context} context
  * @returns
  */
-function noRelativeImportCreate(context: Rule.RuleContext) {
+function noRelativeImportCreate(context: Context): RuleListener {
   const { maxDepth = 2, suggested = false } = context.options[0] || {};
   const settings: RuleSettings = { maxDepth, suggested };
-
 
   return getImport(
     context,
@@ -89,11 +95,11 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
       ) {
         return;
       }
-  
+
       const expected = replaceBackSlashesWithForward(
         getAbsolutePathToTarget(path, configSettings)
       );
-  
+
       if (
         (settings.suggested &&
           getSlashCounts(current) < getSlashCounts(expected)) ||
@@ -101,16 +107,16 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
       ) {
         return;
       }
-  
+
       const data = {
         current,
         expected,
       };
-  
-      const fix = (fixer: Rule.RuleFixer): Rule.Fix =>
+
+      const fix: ReportFixFunction = (fixer) =>
         fixer.replaceTextRange([start + 1, end - 1], expected);
 
-      const descriptor = {
+      const descriptor: ReportDescriptor<MessageIds> = {
         node,
         messageId: "noRelativeImports",
         data,
@@ -122,14 +128,14 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
             fix,
           },
         ],
-      }
-  
+      };
+
       context.report(descriptor);
     },
   );
 }
 
-const rule: Rule.RuleModule = {
+const noRelativeImports: RuleModule<MessageIds, Options> = {
   meta: {
     type: "problem",
     docs: {
@@ -160,7 +166,13 @@ const rule: Rule.RuleModule = {
         "Replace relative import path '{{current}}' with absolute '{{expected}}'",
     },
   },
+  defaultOptions: [
+    {
+      maxDepth: 2,
+      suggested: false,
+    },
+  ],
   create: noRelativeImportCreate,
 };
 
-export default rule;
+export default noRelativeImports;

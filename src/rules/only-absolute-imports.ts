@@ -1,8 +1,15 @@
-import { Rule } from 'eslint';
+import { ReportDescriptor, ReportFixFunction, RuleContext, RuleListener, RuleModule } from '@typescript-eslint/utils/ts-eslint';
+import { relative } from "path";
+
 import { getImport } from "../utils";
 import { isRelativeToParent, isExternalPath } from "../utils/import-types";
-import { relative } from "path";
 import { AliasItem } from "../utils/config";
+
+type MessageIds = "onlyAbsoluteImports" | "replaceOnlyAbsoluteImports";
+
+type Options = [];
+
+type Context = Readonly<RuleContext<MessageIds, Options>>;
 
 /**
  * Creates an absolute path to target using an array of alias items
@@ -38,7 +45,7 @@ function replaceBackSlashesWithForward(path: string): string {
  * @param context - The rule context
  * @returns Rule listener object
  */
-function onlyAbsoluteImportsCreate(context: Rule.RuleContext): Rule.RuleListener {
+function onlyAbsoluteImportsCreate(context: Context): RuleListener {
   return getImport(
     context,
     ({
@@ -67,27 +74,29 @@ function onlyAbsoluteImportsCreate(context: Rule.RuleContext): Rule.RuleListener
         expected,
       };
 
-      const fix = (fixer: Rule.RuleFixer): Rule.Fix =>
+      const fix: ReportFixFunction = (fixer) =>
         fixer.replaceTextRange([start + 1, end - 1], expected);
 
-      context.report({
+      const descriptor: ReportDescriptor<MessageIds> = {
         node,
-        messageId: "noRelativeImports",
+        messageId: "onlyAbsoluteImports",
         data,
         fix,
         suggest: [
           {
-            messageId: "replaceRelativeImport",
+            messageId: "replaceOnlyAbsoluteImports",
             data,
             fix,
           },
         ],
-      });
+      };
+
+      context.report(descriptor);
     }
   );
 }
 
-const rule: Rule.RuleModule = {
+const onlyAbsoluteImportRule: RuleModule<MessageIds> = {
   meta: {
     type: "problem",
     docs: {
@@ -98,11 +107,12 @@ const rule: Rule.RuleModule = {
     hasSuggestions: true,
     schema: [],
     messages: {
-      noRelativeImports: "Relative import path '{{current}}' should be replaced with '{{expected}}'",
-      replaceRelativeImport: "Replace relative import path '{{current}}' with absolute '{{expected}}'",
+      onlyAbsoluteImports: "Relative import path '{{current}}' should be replaced with '{{expected}}'",
+      replaceOnlyAbsoluteImports: "Replace relative import path '{{current}}' with absolute '{{expected}}'",
     },
   },
+  defaultOptions: [],
   create: onlyAbsoluteImportsCreate,
 };
 
-export default rule;
+export default onlyAbsoluteImportRule;

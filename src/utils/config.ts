@@ -1,7 +1,8 @@
 import { join, isAbsolute } from "path";
+
+import { ConfigSettings } from "./types";
 import { FILES } from "./constants";
 import { loadConfigFile, isFileExists, isPathExists } from "./helpers";
-import { ConfigSettings } from "./types";
 
 /**
  * Alias item structure
@@ -55,7 +56,7 @@ export function getConfigSettings(packagePath: string, settings: ConfigSettings)
     fileName = FILES.jsconfig;
   }
 
-  if(settings?.config && isFileExists(packagePath, settings?.config)) {
+  if (settings?.config && isFileExists(packagePath, settings?.config)) {
     fileName = settings?.config;
   }
 
@@ -75,7 +76,7 @@ export function getConfigSettings(packagePath: string, settings: ConfigSettings)
   const createAliasItem = getAliasItemCreator(packagePath);
 
   if (isPathExists(config, "data.compilerOptions.paths")) {
-    const entires: [string, string[]][] = Object.entries(config.data.compilerOptions.paths)
+    const entires: [string, string[]][] = Object.entries(config.data.compilerOptions.paths);
     entires.forEach(([key, paths]) =>
       paths.forEach((path) => urls.push(createAliasItem(path, key)))
     );
