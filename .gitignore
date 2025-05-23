@@ -10,5 +10,7 @@ tsconfig.tsbuildinfo
 
 npm-debug.log*
 
+coverage
+
 yarn-debug.log*
 yarn-error.log*

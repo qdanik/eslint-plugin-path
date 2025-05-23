@@ -1,6 +1,7 @@
+import { RuleContext } from '@typescript-eslint/utils/ts-eslint';
 import { dirname, join, normalize } from "path";
 import * as ESTree from "estree";
-import { Rule } from "eslint";
+
 import { getPackagePath } from "./package";
 import { getConfigSettings, AliasItem } from "./config";
 import { isExistingPath } from "./import-types";
@@ -70,7 +71,12 @@ function configureParams<T>(
  * @param context - The ESLint rule context
  * @param callback - The callback function to call
  */
-export function getImport(context: Rule.RuleContext, callback: (params: ImportHandlerParams) => void): any {
+export function getImport<
+  MessageIds extends string,
+  Options extends readonly unknown[] = []
+>(
+  context: Readonly<RuleContext<MessageIds, Options>>, callback: (params: ImportHandlerParams) => void
+): any {
   const filename = context.filename;
   const settings = (context.settings?.path ?? {}) as ConfigSettings;
 
