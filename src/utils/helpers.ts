@@ -11,7 +11,7 @@ import { loadTsConfig } from "load-tsconfig";
 export function isPathExists(map: Record<string, any>, path: string): boolean {
   let pathToTarget: any = map;
   for (const step of path.split(".")) {
-    pathToTarget = pathToTarget[step];
+    pathToTarget = pathToTarget?.[step];
     if (pathToTarget === undefined) {
       return false;
     }
@@ -35,7 +35,7 @@ export function loadConfigFile(dir: string, filename: string): any {
       };
     }
 
-    const file = loadTsConfig(path);
+    const file = loadTsConfig(dir, filename);
 
     return file;
   } catch (error) {
