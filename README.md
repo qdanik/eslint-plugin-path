@@ -14,15 +14,18 @@ npm install eslint-plugin-path --save-dev
 yarn add eslint-plugin-path --dev
 ```
 
-## ESlint 9+
+## ESLint 10+
 
-If you are using ESLint 9 or later, you can use the plugin without any additional configuration. Just install it and add it to your ESLint configuration.
+This plugin requires ESLint 10 or later and Node.js >= 20.19.0. It uses the flat config format (`eslint.config.js`).
+
+### Basic usage
+
 ```js
 import eslintPluginPath from 'eslint-plugin-path';
 
 export default [
   {
-    files: ['*.{js,ts,jsx,tsx}'],
+    files: ['**/*.{js,ts,jsx,tsx}'],
     plugins: {
       path: eslintPluginPath,
     },
@@ -39,88 +42,87 @@ export default [
 ];
 ```
 
-## ESlint 8 and below
-
-If you are using ESLint 8 or below, you need to add the plugin to your ESLint configuration file. You can do this by adding the following lines to your `.eslintrc` file:
-
-```json
-{
-  "plugins": ["path"],
-  "extends": ["plugin:path/recommended"] // optional
-  "rules": {
-    "path/no-relative-imports": [
-      "error",
-      {
-        "maxDepth": 2,
-        "suggested": false
-      }
-    ]
-  }
-}
-```
-Or if you are using a JavaScript configuration file, you can add the following lines to your `.eslintrc.js` file:
+### Using `defineConfig()`
 
 ```js
-module.exports = {
-  plugins: ['path'],
-  extends: ['plugin:path/recommended'], // optional
-  rules: {
-    'path/no-relative-imports': [
-      'error',
-      {
-        maxDepth: 2,
-        suggested: false,
-      },
-    ],
+import { defineConfig } from 'eslint/config';
+import eslintPluginPath from 'eslint-plugin-path';
+
+export default defineConfig([
+  {
+    files: ['**/*.{js,ts,jsx,tsx}'],
+    plugins: {
+      path: eslintPluginPath,
+    },
+    rules: {
+      'path/no-relative-imports': [
+        'error',
+        {
+          maxDepth: 2,
+          suggested: false,
+        },
+      ],
+    },
   },
-};
+]);
+```
+
+### Using presets
+
+```js
+import eslintPluginPath from 'eslint-plugin-path';
+
+export default [
+  ...eslintPluginPath.configs.recommended,
+];
 ```
 
 ## Custom tsconfig/jsconfig paths
-If you are using custom paths in your `tsconfig.json` or `jsconfig.json` file, you can specify the path to the configuration file in the ESLint configuration file. You can do this by adding the following lines to your config file:
+If you are using custom paths in your `tsconfig.json` or `jsconfig.json` file, you can specify the path to the configuration file in your ESLint settings:
 
-```json
-{
-  "settings": {
-    "path": {
-      "config": "tsconfig.json" // or "./jsconfig.json"
-    }
-  }
-}
-```
+```js
+import eslintPluginPath from 'eslint-plugin-path';
 
-`path/no-absolute-imports` can also flag `compilerOptions.paths` aliases as absolute imports. This is opt-in via `useAliases`:
-
-```json
-{
-  "rules": {
-    "path/no-absolute-imports": ["error", {
-      "useAliases": true,
-      "maxDepth": 1
-    }]
-  }
-}
+export default [
+  {
+    plugins: { path: eslintPluginPath },
+    settings: {
+      path: {
+        config: 'tsconfig.json', // or 'jsconfig.json'
+      },
+    },
+    rules: {
+      'path/no-relative-imports': 'error',
+    },
+  },
+];
 ```
 
 ## Configuration
 
-Enable the rules in your ESLint configuration file:
+Enable the rules in your ESLint flat configuration:
 
-```json
-{
-  "plugins": ["path"],
-  "rules": {
-    "path/no-relative-imports": "error",
+```js
+import eslintPluginPath from 'eslint-plugin-path';
+
+export default [
+  {
+    plugins: { path: eslintPluginPath },
+    rules: {
+      'path/no-relative-imports': 'error',
+    },
   },
-}
+];
 ```
 
-Or add the "recommended" preset:
+Or use the `recommended` preset:
 
-```json
-{
-  "extends": ["plugin:path/recommended"]
-}
+```js
+import eslintPluginPath from 'eslint-plugin-path';
+
+export default [
+  ...eslintPluginPath.configs.recommended,
+];
 ```
 
 ## Rules

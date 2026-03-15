@@ -6,6 +6,7 @@ const eslintPluginPath: TSESLint.FlatConfig.Plugin = {
   meta: {
     name: 'eslint-plugin-path',
     version: packageJson.version,
+    namespace: 'path',
   },
   rules: {
     'no-relative-imports': rules.noRelativeImports,
@@ -21,18 +22,22 @@ const plugins = {
 const flatConfigPlugin: TSESLint.FlatConfig.Plugin = {
   ...eslintPluginPath,
   configs: {
-    recommended: {
-      plugins,
-      rules: {
-        'path/no-relative-imports': ['error', { maxDepth: 1, suggested: true }],
+    recommended: [
+      {
+        plugins,
+        rules: {
+          'path/no-relative-imports': ['error', { maxDepth: 1, suggested: true }],
+        },
       },
-    },
-    all: {
-      plugins,
-      rules: {
-        'path/no-relative-imports': ['error', { maxDepth: 2, suggested: false }],
+    ],
+    all: [
+      {
+        plugins,
+        rules: {
+          'path/no-relative-imports': ['error', { maxDepth: 2, suggested: false }],
+        },
       },
-    },
+    ],
   },
 };
 
