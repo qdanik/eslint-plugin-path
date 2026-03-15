@@ -1,4 +1,4 @@
-import { Literal, Node as ESTreeNode } from "estree";
+import type { Literal, Node as ESTreeNode } from 'estree';
 
 export type ConfigureSource = Literal;
 
@@ -8,5 +8,5 @@ export interface NodeParentExtension {
 }
 
 export interface ConfigSettings {
-  config?: string
+  config?: string;
 }

@@ -89,6 +89,19 @@ If you are using custom paths in your `tsconfig.json` or `jsconfig.json` file, y
 }
 ```
 
+`path/no-absolute-imports` can also flag `compilerOptions.paths` aliases as absolute imports. This is opt-in via `useAliases`:
+
+```json
+{
+  "rules": {
+    "path/no-absolute-imports": ["error", {
+      "useAliases": true,
+      "maxDepth": 1
+    }]
+  }
+}
+```
+
 ## Configuration
 
 Enable the rules in your ESLint configuration file:

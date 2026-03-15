@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-path",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "main": "lib/index.js",
   "author": "qDanik <qdanik@yandex.ru>",
   "license": "MIT",
@@ -27,6 +27,7 @@
   "scripts": {
     "format": "biome lint --write --unsafe && biome format --write && biome check --write --unsafe",
     "build": "rm -rf ./tsconfig.tsbuildinfo && tsc -b",
+    "pretest": "npm run build",
     "test": "jest"
   },
   "dependencies": {
