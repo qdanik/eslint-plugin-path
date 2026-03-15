@@ -9,10 +9,7 @@ jest.mock('node:fs', () => {
   };
 });
 
-const MOCK_FILES = new Set([
-  '/mock/project/package.json',
-  '/mock/project/src/deep/file.js',
-]);
+const MOCK_FILES = new Set(['/mock/project/package.json', '/mock/project/src/deep/file.js']);
 
 const { getPackagePath } = require('../lib/utils/package');
 
