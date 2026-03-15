@@ -1,6 +1,6 @@
+import { dirname, relative } from 'node:path';
 import type { Rule } from 'eslint';
 import { getImport } from '../utils';
-import { relative, dirname } from 'path';
 
 function replaceBackSlashes(path: string): string {
   return path ? path.replace(/\\/g, '/') : '';
@@ -13,7 +13,7 @@ function noAbsoluteImportCreate(context: Rule.RuleContext): Rule.RuleListener {
     let expected = replaceBackSlashes(relative(dirname(filename), path));
 
     if (!expected.startsWith('../')) {
-      expected = './' + expected;
+      expected = `./${expected}`;
     }
 
     const data = { current, expected };

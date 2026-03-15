@@ -1,10 +1,10 @@
-import { dirname, join, normalize } from 'path';
-import type * as ESTree from 'estree';
+import { dirname, join, normalize } from 'node:path';
 import type { Rule } from 'eslint';
-import { getPackagePath } from './package';
+import type * as ESTree from 'estree';
+import type { AliasItem } from './config';
 import { getConfigSettings } from './config';
 import { isExistingPath } from './import-types';
-import type { AliasItem } from './config';
+import { getPackagePath } from './package';
 import type { ConfigSettings, ConfigureSource, NodeParentExtension } from './types';
 
 /**

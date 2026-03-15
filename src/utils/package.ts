@@ -1,6 +1,6 @@
-import { dirname, join, resolve } from "path";
-import { existsSync } from "fs";
-import { FILES } from "./constants";
+import { existsSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { FILES } from './constants';
 
 /**
  * Package.json directory finder
@@ -8,14 +8,14 @@ import { FILES } from "./constants";
  * @returns {string} path to directory where packages.json is located
  */
 export function getPackagePath(filePath: string): string {
-  let dir = resolve(filePath || "", FILES.package);
+  let dir = resolve(filePath || '', FILES.package);
 
   do {
     dir = dirname(dir);
-  } while (!existsSync(join(dir, FILES.package)) && dir !== "/");
+  } while (!existsSync(join(dir, FILES.package)) && dir !== '/');
 
   if (!existsSync(join(dir, FILES.package))) {
-    return process?.cwd() || "";
+    return process?.cwd() || '';
   }
 
   return dir;

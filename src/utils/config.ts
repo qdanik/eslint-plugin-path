@@ -1,6 +1,6 @@
-import { join, isAbsolute } from 'path';
+import { isAbsolute, join } from 'node:path';
 import { FILES } from './constants';
-import { loadConfigFile, isFileExists, isPathExists } from './helpers';
+import { isFileExists, isPathExists, loadConfigFile } from './helpers';
 import type { ConfigSettings } from './types';
 
 /**

@@ -1,8 +1,8 @@
-import { Rule } from 'eslint';
+import { relative } from 'node:path';
+import type { Rule } from 'eslint';
 import { getImport } from '../utils';
-import { isRelativeToParent, isExternalPath } from '../utils/import-types';
-import { relative } from 'path';
-import { AliasItem } from '../utils/config';
+import type { AliasItem } from '../utils/config';
+import { isExternalPath, isRelativeToParent } from '../utils/import-types';
 
 /**
  * Creates an absolute path to target using an array of alias items

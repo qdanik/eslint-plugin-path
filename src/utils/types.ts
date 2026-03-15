@@ -1,4 +1,4 @@
-import type { Literal, Node as ESTreeNode } from 'estree';
+import type { Node as ESTreeNode, Literal } from 'estree';
 
 export type ConfigureSource = Literal;
 

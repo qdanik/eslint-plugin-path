@@ -11,9 +11,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "composite": true,
     "incremental": true,
     "declaration": true,
@@ -25,12 +23,7 @@
     "target": "es6",
     "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
-    "typeRoots": [
-      "node_modules/@types",
-      "src/load-tsconfig.d.ts"
-    ]
+    "typeRoots": ["node_modules/@types", "src/load-tsconfig.d.ts"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
