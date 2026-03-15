@@ -25,7 +25,7 @@
   "packageManager": "npm@11.2.0",
   "repository": "qDanik/eslint-plugin-path",
   "scripts": {
-    "format": "prettier . -w --ignore-path .gitignore",
+    "format": "biome lint --write --unsafe && biome format --write && biome check --write --unsafe",
     "build": "rm -rf ./tsconfig.tsbuildinfo && tsc -b",
     "test": "jest"
   },
@@ -35,6 +35,7 @@
     "load-tsconfig": "^0.2.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.10",
     "@babel/eslint-parser": "^7.27.0",
     "@types/eslint": "^9.6.1",
     "@types/estree": "^1.0.7",
@@ -44,9 +45,7 @@
     "eslint-doc-generator": "^2.1.2",
     "eslint-plugin-eslint-plugin": "^6.4.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.2.6",
     "jest": "^29.7.0",
-    "prettier": "^3.5.3",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3"
   },
