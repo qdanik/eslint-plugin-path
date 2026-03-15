@@ -81,7 +81,9 @@ ruleTester.run('no-relative-imports', rule, {
       code: 'import x from "../../../components/button";',
       filename: FILES.root,
       output: 'import x from "components/button";',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] }],
+      errors: [
+        { messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] },
+      ],
     },
     // maxDepth: 1 — 3 levels of ../ exceeds
     {
@@ -89,7 +91,9 @@ ruleTester.run('no-relative-imports', rule, {
       filename: FILES.root,
       options: [{ maxDepth: 1 }],
       output: 'import x from "components/button";',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] }],
+      errors: [
+        { messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] },
+      ],
     },
     // suggested: true but absolute is shorter — still reports
     {
@@ -97,21 +101,33 @@ ruleTester.run('no-relative-imports', rule, {
       filename: FILES.root,
       options: [{ maxDepth: 2, suggested: true }],
       output: 'import x from "components/button";',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] }],
+      errors: [
+        { messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] },
+      ],
     },
     // require() call
     {
       code: 'const x = require("../../../components/button");',
       filename: FILES.root,
       output: 'const x = require("components/button");',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('const x = require("components/button");')] }],
+      errors: [
+        {
+          messageId: 'noRelativeImports',
+          suggestions: [s('const x = require("components/button");')],
+        },
+      ],
     },
     // Dynamic import()
     {
       code: 'const x = import("../../../components/button");',
       filename: FILES.root,
       output: 'const x = import("components/button");',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('const x = import("components/button");')] }],
+      errors: [
+        {
+          messageId: 'noRelativeImports',
+          suggestions: [s('const x = import("components/button");')],
+        },
+      ],
     },
   ],
 });

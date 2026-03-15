@@ -117,9 +117,7 @@ describe('config', () => {
 
     it('loads jsconfig with baseUrl', () => {
       const result = getConfigSettings('/mock/js-project', {});
-      expect(result).toEqual([
-        { path: '/mock/js-project/src', alias: null, isWildcard: false },
-      ]);
+      expect(result).toEqual([{ path: '/mock/js-project/src', alias: null, isWildcard: false }]);
     });
 
     it('returns cached result on second call', () => {
