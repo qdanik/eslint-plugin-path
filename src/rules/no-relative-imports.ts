@@ -69,8 +69,7 @@ function isMaxDepthExceeded(current: string, settings: RuleSettings): boolean {
  * @returns
  */
 function noRelativeImportCreate(context: Rule.RuleContext) {
-  const { maxDepth = 2, suggested = false } = context.options[0] || {};
-  const settings: RuleSettings = { maxDepth, suggested };
+  const settings: RuleSettings = context.options[0];
 
   return getImport(
     context,
@@ -124,6 +123,7 @@ const rule: Rule.RuleModule = {
     },
     fixable: 'code',
     hasSuggestions: true,
+    defaultOptions: [{ maxDepth: 2, suggested: false }],
     schema: [
       {
         type: 'object',
