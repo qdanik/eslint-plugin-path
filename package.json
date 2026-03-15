@@ -28,7 +28,9 @@
     "format": "biome lint --write --unsafe && biome format --write && biome check --write --unsafe",
     "build": "rm -rf ./tsconfig.tsbuildinfo && tsc -b",
     "pretest": "npm run build",
-    "test": "jest"
+    "type-check": "tsc --noEmit",
+    "test": "jest --silent --runInBand",
+    "test:coverage": "jest --silent --runInBand --coverage"
   },
   "dependencies": {
     "@typescript-eslint/types": "^8.29.0",
@@ -36,10 +38,11 @@
     "load-tsconfig": "^0.2.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.10",
     "@babel/eslint-parser": "^7.27.0",
+    "@biomejs/biome": "2.3.10",
     "@types/eslint": "^9.6.1",
     "@types/estree": "^1.0.7",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.14.0",
     "@typescript-eslint/rule-tester": "^8.29.0",
     "eslint": "^9.24.0",
