@@ -15,8 +15,10 @@ describe('eslint-plugin-path', () => {
 
   it('exports configs', () => {
     expect(plugin.configs?.recommended).toBeDefined();
-    expect(plugin.configs?.recommended?.rules?.['path/no-relative-imports']).toBeDefined();
+    expect(Array.isArray(plugin.configs?.recommended)).toBe(true);
+    expect(plugin.configs?.recommended?.[0]?.rules?.['path/no-relative-imports']).toBeDefined();
     expect(plugin.configs?.all).toBeDefined();
-    expect(plugin.configs?.all?.rules?.['path/no-relative-imports']).toBeDefined();
+    expect(Array.isArray(plugin.configs?.all)).toBe(true);
+    expect(plugin.configs?.all?.[0]?.rules?.['path/no-relative-imports']).toBeDefined();
   });
 });
