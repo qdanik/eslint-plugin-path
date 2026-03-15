@@ -1,12 +1,20 @@
 # path/no-absolute-imports
 
-Disallows the use of absolute file imports. This rule only affects paths included in tsconfig or jsconfig.
+Disallows absolute file imports and replaces them with relative paths.
+
+Any import that resolves to a local file but is not a relative path (`./` or `../`) will be flagged. This includes:
+
+- Rooted imports (`/components/button`)
+- tsconfig/jsconfig `paths` aliases (`@components/button`)
+- `baseUrl`-resolved imports (`presentation/presenters/auth`)
+
+External packages (e.g. `react`, `lodash`) are not affected since they don't resolve to local files.
 
 **Fixable:** This rule is automatically fixable using the `--fix` command line option.
 
-**Doesn't work with eslint-plugin-import/no-absolute-path:**
+**Conflicts with eslint-plugin-import/no-absolute-path:**
 ```
-"import/no-absolute-path": "off" // disable this rule
+"import/no-absolute-path": "off"
 ```
 
 ## Example
@@ -16,33 +24,55 @@ These examples have the following project structure:
 ```
 project
 └─── package.json
+└─── tsconfig.json
 └─── src
-    └─── components
-    └─── pages
+    └─── components/
+    └─── presentation/
+        └─── presenters/
 ```
 
-`project/jsconfig.json` or `project/tsconfig.json`
+`project/tsconfig.json`:
 
-```
+```json
 {
   "compilerOptions": {
-    "baseUrl": "./src"
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["src/components/*"]
+    }
   }
 }
 ```
 
-if `compilerOptions.baseUrl` is unset, it will use `project/` = the dirname of `package.json`
-
 ## Fail
 
 ```js
-// inside "project/src/pages/users/details/index.js"
+// Rooted import
 import foo from "/components/button";
+
+// Alias import
+import foo from "@components/button";
+
+// baseUrl import
+import foo from "presentation/presenters/auth";
 ```
 
 ## Pass
 
 ```js
-// inside "project/src/components/common/input/index.js"
+// Relative import
 import foo from "../../components/button";
+
+// External package — not a local file
+import React from "react";
+```
+
+## Configuration
+
+```json
+{
+  "rules": {
+    "path/no-absolute-imports": "error"
+  }
+}
 ```

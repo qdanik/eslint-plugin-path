@@ -1,9 +1,9 @@
-import { Rule } from 'eslint';
-import { getImport } from "../utils";
-import { AliasItem } from '../utils/config';
-import { isRelativeToParent, isExternalPath } from "../utils/import-types";
-import { relative } from "path";
-import { RuleSettings } from './types';
+import { relative } from 'node:path';
+import type { Rule } from 'eslint';
+import { getImport } from '../utils';
+import type { AliasItem } from '../utils/config';
+import { isExternalPath, isRelativeToParent } from '../utils/import-types';
+import type { RuleSettings } from './types';
 
 /**
  * Creates an absolute path to target using an array of alias items
@@ -11,17 +11,18 @@ import { RuleSettings } from './types';
  * @param {AliasItem[]} aliases
  * @returns {string} - absolute path to target
  */
-function getAbsolutePathToTarget(target: string, aliases:  AliasItem[] = []): string {
+function getAbsolutePathToTarget(target: string, aliases: AliasItem[] = []): string {
   if (!target || !aliases) {
-    return "";
+    return '';
   }
   const absolutePath = aliases
-    .map(({ path, alias }) => `${alias || ""}${relative(path, target)}`)
-    .filter((path) => !isRelativeToParent(path) && path.indexOf("..") === -1);
+    .map(({ path, alias }) => `${alias || ''}${relative(path, target)}`)
+    .filter((path) => !isRelativeToParent(path) && path.indexOf('..') === -1);
 
-  return (absolutePath && absolutePath[0]) || "";
+  return absolutePath?.[0] || '';
 }
 
+const slashCharacterPattern = /[\\/]/;
 /**
  * Calculate slash counts
  * @param {string} path
@@ -32,7 +33,7 @@ function getSlashCounts(path: string): number {
     return 0;
   }
 
-  return (path.split(/[\\/]/).length || 1) - 1;
+  return (path.split(slashCharacterPattern).length || 1) - 1;
 }
 
 /**
@@ -42,9 +43,9 @@ function getSlashCounts(path: string): number {
  */
 function replaceBackSlashesWithForward(path: string): string {
   if (!path) {
-    return "";
+    return '';
   }
-  return path.replace(/\\/g, "/");
+  return path.replace(/\\/g, '/');
 }
 
 /**
@@ -71,59 +72,44 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
   const { maxDepth = 2, suggested = false } = context.options[0] || {};
   const settings: RuleSettings = { maxDepth, suggested };
 
-
   return getImport(
     context,
-    ({
-      node,
-      start,
-      value: current,
-      end,
-      path,
-      packagePath,
-      configSettings,
-    }) => {
+    ({ node, start, value: current, end, path, packagePath, configSettings }) => {
+      if (!isMaxDepthExceeded(current, settings) || isExternalPath(current, packagePath)) {
+        return;
+      }
+
+      const expected = replaceBackSlashesWithForward(getAbsolutePathToTarget(path, configSettings));
+
       if (
-        !isMaxDepthExceeded(current, settings) ||
-        isExternalPath(current, packagePath)
+        (settings.suggested && getSlashCounts(current) < getSlashCounts(expected)) ||
+        expected === ''
       ) {
         return;
       }
-  
-      const expected = replaceBackSlashesWithForward(
-        getAbsolutePathToTarget(path, configSettings)
-      );
-  
-      if (
-        (settings.suggested &&
-          getSlashCounts(current) < getSlashCounts(expected)) ||
-        expected === ""
-      ) {
-        return;
-      }
-  
+
       const data = {
         current,
         expected,
       };
-  
+
       const fix = (fixer: Rule.RuleFixer): Rule.Fix =>
         fixer.replaceTextRange([start + 1, end - 1], expected);
 
       const descriptor = {
         node,
-        messageId: "noRelativeImports",
+        messageId: 'noRelativeImports',
         data,
         fix,
         suggest: [
           {
-            messageId: "replaceRelativeImport",
+            messageId: 'replaceRelativeImport',
             data,
             fix,
           },
         ],
-      }
-  
+      };
+
       context.report(descriptor);
     },
   );
@@ -131,23 +117,22 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
 
 const rule: Rule.RuleModule = {
   meta: {
-    type: "problem",
+    type: 'problem',
     docs: {
-      description:
-        "disallow relative imports of files where absolute is preferred",
-      url: "https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/no-relative-imports.md",
+      description: 'disallow relative imports of files where absolute is preferred',
+      url: 'https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/no-relative-imports.md',
     },
-    fixable: "code",
+    fixable: 'code',
     hasSuggestions: true,
     schema: [
       {
-        type: "object",
+        type: 'object',
         properties: {
           maxDepth: {
-            type: "number",
+            type: 'number',
           },
           suggested: {
-            type: "boolean",
+            type: 'boolean',
           },
         },
         additionalProperties: false,

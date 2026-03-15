@@ -1,16 +1,17 @@
-import { dirname, join, normalize } from "path";
-import * as ESTree from "estree";
-import { Rule } from "eslint";
-import { getPackagePath } from "./package";
-import { getConfigSettings, AliasItem } from "./config";
-import { isExistingPath } from "./import-types";
-import { ConfigSettings, ConfigureSource, NodeParentExtension } from './types';
+import { dirname, join, normalize } from 'node:path';
+import type { Rule } from 'eslint';
+import type * as ESTree from 'estree';
+import type { AliasItem } from './config';
+import { getConfigSettings } from './config';
+import { isExistingPath } from './import-types';
+import { getPackagePath } from './package';
+import type { ConfigSettings, ConfigureSource, NodeParentExtension } from './types';
 
 /**
  * ImportHandlerParams type definition
  */
 interface ImportHandlerParams {
-  node: any; // Consider specifying a more specific type
+  node: any;
   value: string;
   path: string;
   start: number;
@@ -21,41 +22,51 @@ interface ImportHandlerParams {
 }
 
 /**
- * Params configurator
- * @param value - path to file
- * @param config - settings from tsconfig.json/jsconfig.json
- * @returns Returns array of paths
+ * Resolves an import specifier against tsconfig/jsconfig alias and baseUrl entries.
+ * Tries alias patterns first (wildcard and exact), then baseUrl entries.
  */
-const getConfigPaths = (value: string, config: AliasItem[]): string[] =>
-  config.map(({ path }) => join(path, value));
+function resolveFromConfig(value: string, config: AliasItem[]): string {
+  for (const item of config) {
+    if (item.alias === null) {
+      // baseUrl entry — join directly
+      const resolved = join(item.path, value);
+      if (isExistingPath(resolved)) return resolved;
+      continue;
+    }
 
-/**
- * Params configurator
- * @param filename - The name of the file
- * @param node - The node in the AST
- * @param source - The source object containing value and range
- * @param packagePath - The path to package.json
- * @param configSettings - Settings from tsconfig.json/jsconfig.json
- * @returns The configured ImportHandlerParams
- */
+    if (item.isWildcard) {
+      if (!value.startsWith(item.alias)) continue;
+      const remainder = value.slice(item.alias.length);
+      const resolved = join(item.path, remainder);
+      if (isExistingPath(resolved)) return resolved;
+    } else {
+      if (value !== item.alias) continue;
+      if (isExistingPath(item.path)) return item.path;
+    }
+  }
+
+  return '';
+}
+
 function configureParams<T>(
   filename: string,
-  node: T, // Consider specifying a more specific type
+  node: T,
   source: ConfigureSource,
   packagePath: string,
-  configSettings: AliasItem[]
+  configSettings: AliasItem[],
 ): ImportHandlerParams {
-  const value = source.value?.toString() ?? "";
+  const value = source.value?.toString() ?? '';
   let path = normalize(join(dirname(filename), value));
 
   if (!isExistingPath(path)) {
-    path = getConfigPaths(value, configSettings).find(isExistingPath) || "";
+    path = resolveFromConfig(value, configSettings);
   }
-  const [start, end] = source.range || [0, 0]; // Default to [0, 0] if range is undefined
+
+  const [start, end] = source.range || [0, 0];
 
   return {
     node,
-    value: value,
+    value,
     path,
     start,
     end,
@@ -70,7 +81,10 @@ function configureParams<T>(
  * @param context - The ESLint rule context
  * @param callback - The callback function to call
  */
-export function getImport(context: Rule.RuleContext, callback: (params: ImportHandlerParams) => void): any {
+export function getImport(
+  context: Rule.RuleContext,
+  callback: (params: ImportHandlerParams) => void,
+): any {
   const filename = context.filename;
   const settings = (context.settings?.path ?? {}) as ConfigSettings;
 
@@ -82,45 +96,21 @@ export function getImport(context: Rule.RuleContext, callback: (params: ImportHa
 
   return {
     ImportDeclaration: (node: ESTree.ImportDeclaration & NodeParentExtension) => {
-      callback(
-        configureParams(
-          filename,
-          node,
-          node.source,
-          packagePath,
-          configSettings
-        )
-      );
+      callback(configureParams(filename, node, node.source, packagePath, configSettings));
     },
     CallExpression: (node: ESTree.CallExpression & NodeParentExtension) => {
       if (
         node.arguments.length > 0 &&
-        node?.arguments?.[0]?.type === "Literal" &&
-        (node?.callee?.type === "ImportExpression" ||
-          (node?.callee?.type === "Identifier" && node?.callee?.name === "require"))
+        node?.arguments?.[0]?.type === 'Literal' &&
+        (node?.callee?.type === 'ImportExpression' ||
+          (node?.callee?.type === 'Identifier' && node?.callee?.name === 'require'))
       ) {
-        callback(
-          configureParams(
-            filename,
-            node,
-            node.arguments[0],
-            packagePath,
-            configSettings
-          )
-        );
+        callback(configureParams(filename, node, node.arguments[0], packagePath, configSettings));
       }
     },
     ImportExpression: (node: ESTree.ImportExpression & NodeParentExtension) => {
-      if (node.source.type === "Literal") {
-        callback(
-          configureParams(
-            filename,
-            node,
-            node.source,
-            packagePath,
-            configSettings
-          )
-        );
+      if (node.source.type === 'Literal') {
+        callback(configureParams(filename, node, node.source, packagePath, configSettings));
       }
     },
   };

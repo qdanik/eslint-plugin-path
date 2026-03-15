@@ -1,8 +1,8 @@
-import { Rule } from 'eslint';
-import { getImport } from "../utils";
-import { isRelativeToParent, isExternalPath } from "../utils/import-types";
-import { relative } from "path";
-import { AliasItem } from "../utils/config";
+import { relative } from 'node:path';
+import type { Rule } from 'eslint';
+import { getImport } from '../utils';
+import type { AliasItem } from '../utils/config';
+import { isExternalPath, isRelativeToParent } from '../utils/import-types';
 
 /**
  * Creates an absolute path to target using an array of alias items
@@ -12,13 +12,13 @@ import { AliasItem } from "../utils/config";
  */
 function getAbsolutePathToTarget(target: string, aliases: AliasItem[] = []): string {
   if (!target || !aliases.length) {
-    return "";
+    return '';
   }
   const absolutePath = aliases
-    .map(({ path, alias }) => `${alias || ""}${relative(path, target)}`)
-    .filter(path => !isRelativeToParent(path) && !path.includes(".."));
+    .map(({ path, alias }) => `${alias || ''}${relative(path, target)}`)
+    .filter((path) => !isRelativeToParent(path) && !path.includes('..'));
 
-  return absolutePath[0] || "";
+  return absolutePath[0] || '';
 }
 
 /**
@@ -28,9 +28,9 @@ function getAbsolutePathToTarget(target: string, aliases: AliasItem[] = []): str
  */
 function replaceBackSlashesWithForward(path: string): string {
   if (!path) {
-    return "";
+    return '';
   }
-  return path.replace(/\\/g, "/");
+  return path.replace(/\\/g, '/');
 }
 
 /**
@@ -41,22 +41,12 @@ function replaceBackSlashesWithForward(path: string): string {
 function onlyAbsoluteImportsCreate(context: Rule.RuleContext): Rule.RuleListener {
   return getImport(
     context,
-    ({
-      node,
-      start,
-      value: current,
-      end,
-      path,
-      packagePath,
-      configSettings,
-    }) => {
+    ({ node, start, value: current, end, path, packagePath, configSettings }) => {
       if (isExternalPath(current, packagePath) || !path) {
         return;
       }
 
-      const expected = replaceBackSlashesWithForward(
-        getAbsolutePathToTarget(path, configSettings[0]?.aliases || [])
-      );
+      const expected = replaceBackSlashesWithForward(getAbsolutePathToTarget(path, configSettings));
 
       if (current === expected || !expected) {
         return;
@@ -72,34 +62,36 @@ function onlyAbsoluteImportsCreate(context: Rule.RuleContext): Rule.RuleListener
 
       context.report({
         node,
-        messageId: "noRelativeImports",
+        messageId: 'noRelativeImports',
         data,
         fix,
         suggest: [
           {
-            messageId: "replaceRelativeImport",
+            messageId: 'replaceRelativeImport',
             data,
             fix,
           },
         ],
       });
-    }
+    },
   );
 }
 
 const rule: Rule.RuleModule = {
   meta: {
-    type: "problem",
+    type: 'problem',
     docs: {
-      description: "disallow relative imports of files where absolute is preferred",
-      url: "https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/only-absolute-imports.md",
+      description: 'disallow relative imports of files where absolute is preferred',
+      url: 'https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/only-absolute-imports.md',
     },
-    fixable: "code",
+    fixable: 'code',
     hasSuggestions: true,
     schema: [],
     messages: {
-      noRelativeImports: "Relative import path '{{current}}' should be replaced with '{{expected}}'",
-      replaceRelativeImport: "Replace relative import path '{{current}}' with absolute '{{expected}}'",
+      noRelativeImports:
+        "Relative import path '{{current}}' should be replaced with '{{expected}}'",
+      replaceRelativeImport:
+        "Replace relative import path '{{current}}' with absolute '{{expected}}'",
     },
   },
   create: onlyAbsoluteImportsCreate,

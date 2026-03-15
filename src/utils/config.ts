@@ -1,7 +1,7 @@
-import { join, isAbsolute } from "path";
-import { FILES } from "./constants";
-import { loadConfigFile, isFileExists, isPathExists } from "./helpers";
-import { ConfigSettings } from "./types";
+import { isAbsolute, join } from 'node:path';
+import { FILES } from './constants';
+import { isFileExists, isPathExists, loadConfigFile } from './helpers';
+import type { ConfigSettings } from './types';
 
 /**
  * Alias item structure
@@ -9,7 +9,7 @@ import { ConfigSettings } from "./types";
 export interface AliasItem {
   path: string;
   alias: string | null;
-  aliases?: AliasItem[];
+  isWildcard: boolean;
 }
 
 /**
@@ -18,7 +18,7 @@ export interface AliasItem {
  * @returns The cleared tsconfig path matcher value
  */
 export function clearMatcher(value: string): string {
-  return value.replace("*", "");
+  return value.replace('*', '');
 }
 
 /**
@@ -26,11 +26,14 @@ export function clearMatcher(value: string): string {
  * @param packageDir - The package directory
  * @returns Returns alias item creator
  */
-export function getAliasItemCreator(packageDir: string): (path: string, alias?: string) => AliasItem {
+export function getAliasItemCreator(
+  packageDir: string,
+): (path: string, alias?: string) => AliasItem {
   return function createAliasItem(path: string, alias: string | null = null): AliasItem {
     return {
       path: isAbsolute(path) ? clearMatcher(path) : join(packageDir, clearMatcher(path)),
       alias: alias ? clearMatcher(alias) : null,
+      isWildcard: alias?.includes('*') ?? false,
     };
   };
 }
@@ -55,7 +58,7 @@ export function getConfigSettings(packagePath: string, settings: ConfigSettings)
     fileName = FILES.jsconfig;
   }
 
-  if(settings?.config && isFileExists(packagePath, settings?.config)) {
+  if (settings?.config && isFileExists(packagePath, settings?.config)) {
     fileName = settings?.config;
   }
 
@@ -74,14 +77,16 @@ export function getConfigSettings(packagePath: string, settings: ConfigSettings)
   const config = loadConfigFile(packagePath, fileName);
   const createAliasItem = getAliasItemCreator(packagePath);
 
-  if (isPathExists(config, "data.compilerOptions.paths")) {
-    const entires: [string, string[]][] = Object.entries(config.data.compilerOptions.paths)
-    entires.forEach(([key, paths]) =>
-      paths.forEach((path) => urls.push(createAliasItem(path, key)))
-    );
+  if (isPathExists(config, 'data.compilerOptions.paths')) {
+    const entires: [string, string[]][] = Object.entries(config.data.compilerOptions.paths);
+    entires.forEach(([key, paths]) => {
+      paths.forEach((path) => {
+        urls.push(createAliasItem(path, key));
+      });
+    });
   }
 
-  if (isPathExists(config, "data.compilerOptions.baseUrl")) {
+  if (isPathExists(config, 'data.compilerOptions.baseUrl')) {
     urls.push(createAliasItem(config.data.compilerOptions.baseUrl));
   }
 

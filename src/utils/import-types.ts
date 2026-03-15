@@ -1,18 +1,17 @@
-import { resolve } from "path";
-import { existsSync } from "fs";
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
+const extensions = ['.js', '.ts', '.jsx', '.tsx'];
+const modulesFolder = 'node_modules';
 
-const extensions = [".js", ".ts", ".jsx", ".tsx"];
-const modulesFolder = "node_modules";
-
-
+const relativeToParentPattern = /^\.\.$|^\.\.[\\/]/;
 /**
  * Check if the path is relative to the parent directory.
  * @param path - The path to check.
  * @returns True if the path is relative to the parent directory.
  */
 export function isRelativeToParent(path: string): boolean {
-  return /^\.\.$|^\.\.[\\/]/.test(path);
+  return relativeToParentPattern.test(path);
 }
 
 /**
@@ -21,7 +20,11 @@ export function isRelativeToParent(path: string): boolean {
  * @returns True if the path exists.
  */
 export function isExistingPath(path: string): boolean {
-  const paths = [path, ...extensions.map((ext) => `${path}${ext}`), ...extensions.map((ext) => `${path}/index${ext}`)];
+  const paths = [
+    path,
+    ...extensions.map((ext) => `${path}${ext}`),
+    ...extensions.map((ext) => `${path}/index${ext}`),
+  ];
 
   return paths.some((target) => existsSync(target));
 }

@@ -1,6 +1,6 @@
-import { join } from "path";
-import { existsSync, readFileSync } from "fs";
-import { loadTsConfig } from "load-tsconfig";
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadTsConfig } from 'load-tsconfig';
 
 /**
  * Helps to detect if a path exists or not
@@ -10,7 +10,7 @@ import { loadTsConfig } from "load-tsconfig";
  */
 export function isPathExists(map: Record<string, any>, path: string): boolean {
   let pathToTarget: any = map;
-  for (const step of path.split(".")) {
+  for (const step of path.split('.')) {
     pathToTarget = pathToTarget?.[step];
     if (pathToTarget === undefined) {
       return false;
@@ -29,16 +29,16 @@ export function loadConfigFile(dir: string, filename: string): any {
   try {
     const path = join(dir, filename);
 
-    if (filename === "jsconfig.json") {
+    if (filename === 'jsconfig.json') {
       return {
-        data: JSON.parse(readFileSync(path, "utf8")),
+        data: JSON.parse(readFileSync(path, 'utf8')),
       };
     }
 
     const file = loadTsConfig(dir, filename);
 
     return file;
-  } catch (error) {
+  } catch (_error) {
     throw new Error(`'${filename}' is invalid. Please, validate JSON file.`);
   }
 }

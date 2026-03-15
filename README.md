@@ -1,4 +1,6 @@
-# eslint-plugin-path [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+# eslint-plugin-path
+[![Biome](https://img.shields.io/badge/linting-biome-60a5fa?style=flat-square)](https://biomejs.dev)
+[![code style: biome](https://img.shields.io/badge/code_style-biome-60a5fa?style=flat-square)](https://biomejs.dev)
 
 An ESLint plugin for enforcing consistent imports across project. In other words, it helps to replace all relatives import with absolutes dependinng on settings.
 
@@ -83,6 +85,19 @@ If you are using custom paths in your `tsconfig.json` or `jsconfig.json` file, y
     "path": {
       "config": "tsconfig.json" // or "./jsconfig.json"
     }
+  }
+}
+```
+
+`path/no-absolute-imports` can also flag `compilerOptions.paths` aliases as absolute imports. This is opt-in via `useAliases`:
+
+```json
+{
+  "rules": {
+    "path/no-absolute-imports": ["error", {
+      "useAliases": true,
+      "maxDepth": 1
+    }]
   }
 }
 ```
