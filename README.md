@@ -81,6 +81,8 @@ export default [
 If you are using custom paths in your `tsconfig.json` or `jsconfig.json` file, you can specify the path to the configuration file in your ESLint settings:
 
 ```js
+import eslintPluginPath from 'eslint-plugin-path';
+
 export default [
   {
     plugins: { path: eslintPluginPath },
