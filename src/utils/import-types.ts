@@ -4,6 +4,16 @@ import { resolve } from 'node:path';
 const extensions = ['.js', '.ts', '.jsx', '.tsx'];
 const modulesFolder = 'node_modules';
 
+const relativePattern = /^\.\.?($|[\\/])/;
+/**
+ * Check if the path is a relative import specifier (`.`, `..`, `./x`, `../x`).
+ * @param path - The path to check.
+ * @returns True if the path is relative.
+ */
+export function isRelativePath(path: string): boolean {
+  return relativePattern.test(path);
+}
+
 const relativeToParentPattern = /^\.\.$|^\.\.[\\/]/;
 /**
  * Check if the path is relative to the parent directory.

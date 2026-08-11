@@ -5,6 +5,7 @@
  *   /project/root     — jsconfig with baseUrl: "./src"
  *   /project/alias    — tsconfig with paths (@components/*, @exact, @multi/*)
  *   /project/baseurl  — tsconfig with baseUrl: "." only
+ *   /project/hybrid   — tsconfig with BOTH paths (@/*) and baseUrl: "." (issue #24)
  */
 
 const mockExistingFiles = new Set([
@@ -28,6 +29,11 @@ const mockExistingFiles = new Set([
   '/project/baseurl/tsconfig.json',
   '/project/baseurl/presentation/presenters/auth.ts',
   '/project/baseurl/presentation/presenters/auth/index.ts',
+  // Hybrid project (tsconfig with both paths and baseUrl — issue #24)
+  '/project/hybrid/package.json',
+  '/project/hybrid/tsconfig.json',
+  '/project/hybrid/src/auth/Auth.model.ts',
+  '/project/hybrid/src/app/pages/deep/consumer.ts',
   // No-config project (no tsconfig/jsconfig — configSettings = [])
   '/project/noconfig/package.json',
   '/project/noconfig/src/sub/file.js',
@@ -57,6 +63,11 @@ function setupMocks() {
       if (dir === '/project/baseurl') {
         return { data: { compilerOptions: { baseUrl: '.' } } };
       }
+      if (dir === '/project/hybrid') {
+        return {
+          data: { compilerOptions: { baseUrl: '.', paths: { '@/*': ['./*'] } } },
+        };
+      }
       if (dir === '/project/alias') {
         return {
           data: {
@@ -80,6 +91,7 @@ const FILES = {
   root: '/project/root/src/pages/users/details/index.js',
   alias: '/project/alias/src/app/pages/feature/deep/use-alias.js',
   baseurl: '/project/baseurl/src/pages/feature/index.ts',
+  hybrid: '/project/hybrid/src/app/pages/deep/consumer.ts',
   noconfig: '/project/noconfig/src/sub/file.js',
 };
 

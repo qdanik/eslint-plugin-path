@@ -2,7 +2,7 @@ import { relative } from 'node:path';
 import type { Rule } from 'eslint';
 import { getImport } from '../utils';
 import type { AliasItem } from '../utils/config';
-import { isExternalPath, isRelativeToParent } from '../utils/import-types';
+import { isExternalPath, isRelativePath, isRelativeToParent } from '../utils/import-types';
 import type { RuleSettings } from './types';
 
 /**
@@ -75,7 +75,13 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
   return getImport(
     context,
     ({ node, start, value: current, end, path, packagePath, configSettings }) => {
-      if (!isMaxDepthExceeded(current, settings) || isExternalPath(current, packagePath)) {
+      // Only relative specifiers are in scope. Alias and baseUrl imports are already
+      // absolute, and rewriting them here reports them as "Relative import path".
+      if (
+        !isRelativePath(current) ||
+        !isMaxDepthExceeded(current, settings) ||
+        isExternalPath(current, packagePath)
+      ) {
         return;
       }
 
@@ -83,7 +89,10 @@ function noRelativeImportCreate(context: Rule.RuleContext) {
 
       if (
         (settings.suggested && getSlashCounts(current) < getSlashCounts(expected)) ||
-        expected === ''
+        expected === '' ||
+        // Nothing to fix when the suggestion is what is already written — otherwise the
+        // message names the same path twice and the fixer rewrites the specifier to itself
+        expected === current
       ) {
         return;
       }
