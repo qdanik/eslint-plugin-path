@@ -22,6 +22,30 @@ ruleTester.run('no-relative-imports', rule, {
     { code: 'import x from "../components/button";', filename: FILES.root },
     // Absolute import — not relative, skipped
     { code: 'import x from "@components/button";', filename: FILES.alias },
+    // Issue #24 — a negative maxDepth makes every specifier "too deep", which let
+    // non-relative imports reach the report: an aliased one matched itself, and a
+    // baseUrl one was rewritten into alias form under a "Relative import path" message.
+    {
+      code: 'import x from "@/src/auth/Auth.model";',
+      filename: FILES.hybrid,
+      options: [{ maxDepth: -1 }],
+    },
+    {
+      code: 'import x from "@/src/auth/Auth.model";',
+      filename: FILES.hybrid,
+      options: [{ maxDepth: -1, suggested: true }],
+    },
+    {
+      code: 'import x from "src/auth/Auth.model";',
+      filename: FILES.hybrid,
+      options: [{ maxDepth: -1 }],
+    },
+    // Bare specifier for a package that is not installed — still not a relative import
+    {
+      code: 'import x from "some-lib/deep";',
+      filename: FILES.hybrid,
+      options: [{ maxDepth: -1 }],
+    },
     // External package
     { code: 'import React from "react";', filename: FILES.root },
     // maxDepth: 3 — exactly 3 levels is within limit (3 < 3 = false)
