@@ -55,12 +55,9 @@ function replaceBackSlashesWithForward(path: string): string {
  * @returns {boolean} - true if max depth exceeded
  */
 function isMaxDepthExceeded(current: string, settings: RuleSettings): boolean {
-  if (!current) {
-    return false;
-  }
-  const result = current.match(/\.\.[\\/]/g) || [];
+  const parentSegments = current.match(/\.\.[\\/]/g) || [];
 
-  return settings.maxDepth < result.length;
+  return settings.maxDepth < parentSegments.length;
 }
 
 /**

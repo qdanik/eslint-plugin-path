@@ -2,7 +2,7 @@
 [![Biome](https://img.shields.io/badge/linting-biome-60a5fa?style=flat-square)](https://biomejs.dev)
 [![code style: biome](https://img.shields.io/badge/code_style-biome-60a5fa?style=flat-square)](https://biomejs.dev)
 
-An ESLint plugin for enforcing consistent imports across project. In other words, it helps to replace all relatives import with absolutes dependinng on settings.
+An ESLint plugin for enforcing consistent import paths across a project. It rewrites relative imports to absolute ones (or the reverse), based on the `paths` and `baseUrl` in your `tsconfig.json` / `jsconfig.json`.
 
 ## Installation
 
@@ -16,7 +16,9 @@ yarn add eslint-plugin-path --dev
 
 ## ESLint 10+
 
-This plugin requires ESLint 10 or later and Node.js >= 20.19.0. It uses the flat config format (`eslint.config.js`).
+This plugin requires ESLint 10 or later and Node.js `^20.19.0 || ^22.13.0 || >=24` — the same range ESLint 10 supports.
+
+It uses the flat config format (`eslint.config.js`). The legacy `.eslintrc` format was removed in ESLint 10 and is not supported.
 
 ### Basic usage
 
@@ -125,22 +127,46 @@ export default [
 ];
 ```
 
+## What is checked
+
+All three rules inspect the specifier of these forms:
+
+```js
+import x from '../../components/button';   // static import
+import('../../components/button');         // dynamic import
+require('../../components/button');        // CommonJS require
+```
+
+Re-export declarations are **not** checked:
+
+```js
+export * from '../../components/button';        // not reported
+export { Button } from '../../components/button'; // not reported
+```
+
+Bare specifiers that resolve inside `node_modules` (e.g. `react`) are always skipped.
+
 ## Rules
 
 ✔ included in the "recommended" preset
 
 🔧 fixable using the `--fix` command line option
 
-|     |     | Name                                                                                                                      | Description                                                                |
-| --- | --- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ✔   | 🔧  | [no-relative-imports](https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/no-relative-imports.md) | disallow relative imports of files where absolute is preferred |
-|    | 🔧  | [no-absolute-imports](https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/no-absolute-imports.md) | disallow absolute imports of files where relative is preferred |
-|    | 🔧  | [only-absolute-imports](https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/only-absolute-imports.md) |disallow relative imports of files through the whole project |
+💡 provides editor suggestions
+
+|     |     |     | Name                                                                                                                      | Description                                                                |
+| --- | --- | --- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ✔   | 🔧  | 💡  | [no-relative-imports](https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/no-relative-imports.md) | disallow relative imports of files where absolute is preferred |
+|    | 🔧  | 💡  | [no-absolute-imports](https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/no-absolute-imports.md) | disallow absolute imports of files where relative is preferred |
+|    | 🔧  | 💡  | [only-absolute-imports](https://github.com/qDanik/eslint-plugin-path/blob/main/docs/rules/only-absolute-imports.md) |disallow relative imports of files through the whole project |
 
 ## Presets
 
-- `recommended` enables rules recommended for all users
-- `all` enables all rules
+- `recommended` — enables `no-relative-imports` with `{ maxDepth: 1, suggested: true }`. Note this is stricter than the rule's own defaults (`{ maxDepth: 2, suggested: false }`).
+
+`recommended` is the only preset. The three rules express mutually exclusive policies, so no single config can enable them together — pick the one rule that matches your project and configure it explicitly.
+
+> **Removed in 3.0.0:** the `all` preset. It never enabled all rules — it enabled only `no-relative-imports`, with weaker settings than `recommended`. See the [CHANGELOG](./CHANGELOG.md).
 
 # License
 

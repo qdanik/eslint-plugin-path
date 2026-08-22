@@ -26,7 +26,7 @@ project
 }
 ```
 
-if `compilerOptions.baseUrl` is unset, it will use `project/` = the dirname of `package.json`
+The rule resolves absolute forms from `compilerOptions.paths` and `compilerOptions.baseUrl`. If neither is configured — or no `tsconfig.json` / `jsconfig.json` is found next to `package.json` — the rule reports nothing, since there is no absolute form to suggest.
 
 
 ## Fail
@@ -41,11 +41,6 @@ if `compilerOptions.baseUrl` is unset, it will use `project/` = the dirname of `
   import { Button } from "../../components";
   ```
 
-  ```js
-  // inside "project/src/components/button/index.ts"
-  export * from "./button";
-  ```
-
 ## Pass
   
   ```js
@@ -58,7 +53,12 @@ if `compilerOptions.baseUrl` is unset, it will use `project/` = the dirname of `
   import { Button } from "components";
   ```
 
-  ```js
-  // inside "project/src/components/button/index.ts"
-  export * from "./button";
-  ```
+## Not checked
+
+Re-export declarations are not inspected by this rule, so these are never reported regardless of configuration:
+
+```js
+// inside "project/src/components/button/index.ts"
+export * from "./button";
+export { Button } from "../../components/button";
+```

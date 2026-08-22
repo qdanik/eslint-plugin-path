@@ -28,6 +28,12 @@ ruleTester.run('no-absolute-imports', rule, {
     { code: 'import x from "@components/metal/shiny/missing";', filename: FILES.alias },
     // No config project — no tsconfig/jsconfig
     { code: 'import x from "some-import";', filename: FILES.noconfig },
+    // Re-exports are not inspected — see docs/rules/no-absolute-imports.md "Not checked".
+    // The identical specifier IS reported as an import in the invalid cases below, so these
+    // pass only because export declarations are never visited.
+    { code: 'export * from "@components/button";', filename: FILES.alias },
+    { code: 'export { Button } from "@components/button";', filename: FILES.alias },
+    { code: 'export * as Button from "@components/button";', filename: FILES.alias },
   ],
   invalid: [
     // Rooted import (baseUrl project)
