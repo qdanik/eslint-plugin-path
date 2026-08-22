@@ -13,10 +13,20 @@ describe('eslint-plugin-path', () => {
     expect(plugin.meta?.version).toBeDefined();
   });
 
-  it('exports configs', () => {
+  it('exports the recommended preset', () => {
     expect(plugin.configs?.recommended).toBeDefined();
-    expect(plugin.configs?.recommended?.rules?.['path/no-relative-imports']).toBeDefined();
-    expect(plugin.configs?.all).toBeDefined();
-    expect(plugin.configs?.all?.rules?.['path/no-relative-imports']).toBeDefined();
+    expect(Array.isArray(plugin.configs?.recommended)).toBe(true);
+    expect(plugin.configs?.recommended?.[0]?.rules?.['path/no-relative-imports']).toEqual([
+      'error',
+      { maxDepth: 1, suggested: true },
+    ]);
+  });
+
+  // Removed in 3.0.0: `all` never enabled all rules — it enabled only
+  // no-relative-imports, with weaker settings than `recommended`. The three rules
+  // contradict each other, so no preset can enable them together.
+  it('no longer exports an "all" preset', () => {
+    expect(plugin.configs?.all).toBeUndefined();
+    expect(Object.keys(plugin.configs ?? {})).toEqual(['recommended']);
   });
 });

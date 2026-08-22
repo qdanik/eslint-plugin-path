@@ -103,3 +103,7 @@ import foo from "components/button";
 // inside "project/src/components/common/input/index.js"
 import foo from "components/button";
 ```
+
+## Not checked
+
+Re-export declarations (`export * from '...'`, `export { x } from '...'`) are not inspected and are never reported. Static `import`, dynamic `import()` and `require()` specifiers are all checked.

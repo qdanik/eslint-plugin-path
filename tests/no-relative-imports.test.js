@@ -72,8 +72,14 @@ ruleTester.run('no-relative-imports', rule, {
       filename: FILES.root,
       options: [{ maxDepth: 2, suggested: true }],
     },
-    // Empty import string — isMaxDepthExceeded(!current) branch
+    // Empty import string — isRelativePath('') is false, so the rule returns early
     { code: 'const x = require("");', filename: FILES.root },
+    // Re-exports are not inspected — see docs/rules/no-relative-imports.md "Not checked".
+    // The identical specifier IS reported as an import in the invalid cases below, so these
+    // pass only because export declarations are never visited.
+    { code: 'export * from "../../../components/button";', filename: FILES.root },
+    { code: 'export { Button } from "../../../components/button";', filename: FILES.root },
+    { code: 'export * as Button from "../../../components/button";', filename: FILES.root },
   ],
   invalid: [
     // Default maxDepth (2) — 3 levels of ../ exceeds
@@ -81,7 +87,9 @@ ruleTester.run('no-relative-imports', rule, {
       code: 'import x from "../../../components/button";',
       filename: FILES.root,
       output: 'import x from "components/button";',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] }],
+      errors: [
+        { messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] },
+      ],
     },
     // maxDepth: 1 — 3 levels of ../ exceeds
     {
@@ -89,7 +97,9 @@ ruleTester.run('no-relative-imports', rule, {
       filename: FILES.root,
       options: [{ maxDepth: 1 }],
       output: 'import x from "components/button";',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] }],
+      errors: [
+        { messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] },
+      ],
     },
     // suggested: true but absolute is shorter — still reports
     {
@@ -97,21 +107,33 @@ ruleTester.run('no-relative-imports', rule, {
       filename: FILES.root,
       options: [{ maxDepth: 2, suggested: true }],
       output: 'import x from "components/button";',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] }],
+      errors: [
+        { messageId: 'noRelativeImports', suggestions: [s('import x from "components/button";')] },
+      ],
     },
     // require() call
     {
       code: 'const x = require("../../../components/button");',
       filename: FILES.root,
       output: 'const x = require("components/button");',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('const x = require("components/button");')] }],
+      errors: [
+        {
+          messageId: 'noRelativeImports',
+          suggestions: [s('const x = require("components/button");')],
+        },
+      ],
     },
     // Dynamic import()
     {
       code: 'const x = import("../../../components/button");',
       filename: FILES.root,
       output: 'const x = import("components/button");',
-      errors: [{ messageId: 'noRelativeImports', suggestions: [s('const x = import("components/button");')] }],
+      errors: [
+        {
+          messageId: 'noRelativeImports',
+          suggestions: [s('const x = import("components/button");')],
+        },
+      ],
     },
   ],
 });

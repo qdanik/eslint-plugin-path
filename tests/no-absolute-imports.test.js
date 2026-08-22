@@ -28,6 +28,12 @@ ruleTester.run('no-absolute-imports', rule, {
     { code: 'import x from "@components/metal/shiny/missing";', filename: FILES.alias },
     // No config project — no tsconfig/jsconfig
     { code: 'import x from "some-import";', filename: FILES.noconfig },
+    // Re-exports are not inspected — see docs/rules/no-absolute-imports.md "Not checked".
+    // The identical specifier IS reported as an import in the invalid cases below, so these
+    // pass only because export declarations are never visited.
+    { code: 'export * from "@components/button";', filename: FILES.alias },
+    { code: 'export { Button } from "@components/button";', filename: FILES.alias },
+    { code: 'export * as Button from "@components/button";', filename: FILES.alias },
   ],
   invalid: [
     // Rooted import (baseUrl project)
@@ -35,56 +41,93 @@ ruleTester.run('no-absolute-imports', rule, {
       code: 'import x from "/components/button";',
       filename: FILES.root,
       output: 'import x from "../../../components/button";',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../components/button";')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('import x from "../../../components/button";')],
+        },
+      ],
     },
     // Wildcard alias
     {
       code: 'import x from "@components/metal/shiny/shiny-components";',
       filename: FILES.alias,
       output: 'import x from "../../../components/metal/shiny/shiny-components";',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../components/metal/shiny/shiny-components";')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('import x from "../../../components/metal/shiny/shiny-components";')],
+        },
+      ],
     },
     // Exact alias
     {
       code: 'import x from "@exact";',
       filename: FILES.alias,
       output: 'import x from "../../../exact";',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../exact";')] }],
+      errors: [
+        { messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../exact";')] },
+      ],
     },
     // Multi-target alias (first missing, second found)
     {
       code: 'import x from "@multi/button";',
       filename: FILES.alias,
       output: 'import x from "../../../components/button";',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../components/button";')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('import x from "../../../components/button";')],
+        },
+      ],
     },
     // Single-segment alias
     {
       code: 'import x from "@components/button";',
       filename: FILES.alias,
       output: 'import x from "../../../components/button";',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../components/button";')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('import x from "../../../components/button";')],
+        },
+      ],
     },
     // BaseUrl import
     {
       code: 'import x from "presentation/presenters/auth";',
       filename: FILES.baseurl,
       output: 'import x from "../../../presentation/presenters/auth";',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('import x from "../../../presentation/presenters/auth";')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('import x from "../../../presentation/presenters/auth";')],
+        },
+      ],
     },
     // require() call
     {
       code: 'const x = require("@components/button");',
       filename: FILES.alias,
       output: 'const x = require("../../../components/button");',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('const x = require("../../../components/button");')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('const x = require("../../../components/button");')],
+        },
+      ],
     },
     // Dynamic import()
     {
       code: 'const x = import("@components/button");',
       filename: FILES.alias,
       output: 'const x = import("../../../components/button");',
-      errors: [{ messageId: 'noAbsoluteImports', suggestions: [s('const x = import("../../../components/button");')] }],
+      errors: [
+        {
+          messageId: 'noAbsoluteImports',
+          suggestions: [s('const x = import("../../../components/button");')],
+        },
+      ],
     },
     // Self-directory import via baseUrl (relative returns '' → ./)
     {

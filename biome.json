@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
   "vcs": {
     "useIgnoreFile": true,
     "defaultBranch": "main",
@@ -28,9 +28,6 @@
         "noDelete": "off",
         "useTopLevelRegex": "error"
       },
-      "nursery": {
-        "noImportCycles": "error"
-      },
       "complexity": {
         "useLiteralKeys": "off"
       },
@@ -46,7 +43,7 @@
       "security": {
         "noBlankTarget": "error"
       },
-      "recommended": true
+      "preset": "recommended"
     }
   },
   "assist": {

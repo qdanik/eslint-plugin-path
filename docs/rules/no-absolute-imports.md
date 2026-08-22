@@ -76,3 +76,7 @@ import React from "react";
   }
 }
 ```
+
+## Not checked
+
+Re-export declarations (`export * from '...'`, `export { x } from '...'`) are not inspected and are never reported. Static `import`, dynamic `import()` and `require()` specifiers are all checked.
